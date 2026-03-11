@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: skylink-delta-ai
+    runtime: python
+    rootDir: .
+    buildCommand: echo "No build needed"
+    startCommand: python backend/main.py
+    envVars:
+      - key: AI_MODE
+        value: local
+      - key: ANTHROPIC_API_KEY
+        value: your-key-here   # optional - only if using Claude API

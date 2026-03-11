@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skylink Delta — AI Intercom Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ VARIABLES ═══════════════════ */
+:root {
+  --ink:    #0b0f1a;
+  --paper:  #f4efe4;
+  --steel:  #1c2b4a;
+  --sky:    #1a6bff;
+  --teal:   #00cfb4;
+  --warm:   #e8d5b0;
+  --muted:  #8a95a8;
+  --card:   #ffffff;
+  --border: #ddd5c8;
+  --red:    #e84545;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Mono',monospace;background:var(--paper);color:var(--ink);overflow-x:hidden;}
+a{text-decoration:none;}
+
+/* ═══════════════════ NAV ═══════════════════ */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 64px;
+  background:rgba(244,239,228,.95);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.logo-sq{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--steel);
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-sq svg{width:20px;height:20px;}
+.logo-text{
+  font-family:'Syne',sans-serif;font-size:17px;font-weight:800;
+  color:var(--steel);letter-spacing:-.5px;
+}
+.logo-text span{color:var(--sky);}
+.nav-links{display:flex;align-items:center;gap:30px;list-style:none;}
+.nav-links a{
+  font-size:11px;letter-spacing:1.3px;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;
+}
+.nav-links a:hover{color:var(--steel);}
+.nav-cta{
+  background:var(--sky)!important;color:white!important;
+  padding:9px 22px;border-radius:8px;
+  font-size:11px!important;letter-spacing:1px!important;
+}
+.nav-cta:hover{background:#0050d8!important;}
+
+/* ═══════════════════ HERO ═══════════════════ */
+.hero {
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  padding-top:70px;overflow:hidden;
+}
+.hero-left{
+  padding:88px 48px 80px 72px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--warm);border:1px solid var(--border);
+  border-radius:30px;padding:7px 18px;
+  font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--steel);margin-bottom:28px;width:fit-content;
+}
+.dot-pulse{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--teal);animation:dpulse 2s infinite;
+}
+@keyframes dpulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.5);}}
+
+h1.hero-h {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(40px,5vw,72px);
+  font-weight:800;line-height:1.0;letter-spacing:-2px;
+  color:var(--steel);margin-bottom:8px;
+}
+h1.hero-h em {
+  font-family:'Instrument Serif',serif;
+  font-style:italic;font-weight:400;
+  color:var(--sky);letter-spacing:-1px;
+}
+.hero-sub{
+  font-size:14px;color:var(--muted);line-height:1.85;
+  max-width:420px;margin-bottom:40px;font-weight:300;
+}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:13px 28px;border-radius:9px;
+  font-family:'DM Mono',monospace;font-size:12px;font-weight:500;
+  letter-spacing:.3px;border:none;cursor:pointer;transition:all .2s;
+}
+.btn-blue{background:var(--sky);color:white;box-shadow:0 4px 20px rgba(26,107,255,.3);}
+.btn-blue:hover{background:#0050d8;transform:translateY(-1px);}
+.btn-outline{background:transparent;color:var(--steel);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--steel);}
+
+.hero-stats{
+  display:flex;gap:40px;margin-top:56px;
+  padding-top:28px;border-top:1px solid var(--border);
+}
+.stat-n{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--steel);}
+.stat-l{font-size:10px;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase;margin-top:2px;}
+
+/* HERO RIGHT */
+.hero-right{
+  background:var(--steel);
+  display:flex;align-items:center;justify-content:center;
+  padding:60px 44px;
+  clip-path:polygon(8% 0,100% 0,100% 100%,0 100%);
+  position:relative;overflow:hidden;
+}
+.hero-right::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 70% 30%,rgba(26,107,255,.3),transparent 55%),
+    radial-gradient(ellipse at 20% 80%,rgba(0,207,180,.2),transparent 55%);
+}
+.preview-card{
+  width:100%;max-width:372px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;overflow:hidden;
+  position:relative;z-index:2;
+}
+.pc-head{
+  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:12px;
+}
+.pc-av{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(135deg,var(--sky),var(--teal));
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.pc-name{color:white;font-size:14px;font-weight:500;}
+.pc-status{color:var(--teal);font-size:11px;margin-top:2px;}
+.pc-msgs{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.pm{
+  padding:11px 14px;border-radius:14px;
+  font-size:12px;line-height:1.55;max-width:82%;
+  animation:slideUp .5s ease both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.pm-bot{
+  background:rgba(255,255,255,.11);color:rgba(255,255,255,.92);
+  border-bottom-left-radius:4px;border:1px solid rgba(255,255,255,.1);
+}
+.pm-user{
+  background:var(--sky);color:white;
+  border-bottom-right-radius:4px;align-self:flex-end;
+  animation-delay:.3s;
+}
+.pm-bot2{animation-delay:.7s;}
+.pc-inp{
+  padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);
+  display:flex;gap:8px;align-items:center;
+}
+.fi-fake{
+  flex:1;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:8px 14px;color:rgba(255,255,255,.35);
+  font-size:12px;font-family:'DM Mono',monospace;
+}
+.send-fake{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--sky);display:flex;align-items:center;
+  justify-content:center;color:white;font-size:13px;
+}
+
+/* ═══════════════════ SECTIONS ═══════════════════ */
+.section{padding:96px 72px;}
+.s-chip{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--sky);margin-bottom:14px;font-weight:500;
+}
+.s-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(30px,3.8vw,52px);font-weight:800;
+  color:var(--steel);letter-spacing:-1.5px;line-height:1.1;margin-bottom:14px;
+}
+.s-sub{font-size:13px;color:var(--muted);max-width:460px;line-height:1.9;font-weight:300;}
+
+/* ═══════════════════ FEATURES ═══════════════════ */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px;}
+.f-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:28px;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.f-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--sky),var(--teal));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;
+}
+.f-card:hover{border-color:var(--sky);transform:translateY(-4px);box-shadow:0 20px 48px rgba(26,107,255,.1);}
+.f-card:hover::after{transform:scaleX(1);}
+.f-icon{
+  width:46px;height:46px;border-radius:12px;
+  background:#eef3ff;display:flex;align-items:center;
+  justify-content:center;font-size:21px;margin-bottom:16px;
+}
+.f-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--steel);margin-bottom:8px;}
+.f-desc{font-size:12px;color:var(--muted);line-height:1.85;font-weight:300;}
+
+/* ═══════════════════ QUICK REF ═══════════════════ */
+.qsec{padding:80px 72px;background:var(--steel);color:white;}
+.qsec .s-chip{color:var(--teal);}
+.qsec .s-title{color:white;}
+.qsec .s-sub{color:rgba(255,255,255,.5);}
+.qr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px;margin-top:52px;}
+.qr-card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;padding:26px;
+}
+.qr-head{
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  color:white;margin-bottom:18px;
+  display:flex;align-items:center;gap:9px;
+}
+.qr-head span{
+  width:27px;height:27px;border-radius:7px;
+  background:rgba(26,107,255,.28);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+table.ct{width:100%;border-collapse:collapse;}
+table.ct tr{border-bottom:1px solid rgba(255,255,255,.07);}
+table.ct tr:last-child{border:none;}
+table.ct td{padding:7px 4px;font-size:12px;vertical-align:middle;}
+table.ct td:first-child{color:rgba(255,255,255,.6);font-weight:300;}
+table.ct td:last-child{
+  text-align:right;
+  font-family:'DM Mono',monospace;color:var(--teal);
+  background:rgba(0,207,180,.09);
+  padding:4px 10px;border-radius:6px;font-size:11px;
+  white-space:nowrap;
+}
+
+/* ═══════════════════ AI CHAT ═══════════════════ */
+.chat-section{padding:96px 72px;background:var(--paper);}
+.chat-box{
+  max-width:840px;margin:52px auto 0;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:26px;overflow:hidden;
+  box-shadow:0 32px 80px rgba(28,43,74,.12);
+}
+.chat-top{
+  background:var(--steel);padding:18px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ct-left{display:flex;align-items:center;gap:12px;}
+.ct-av{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(135deg,var(--sky),var(--teal));
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+}
+.ct-name{color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+.ct-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:2px;}
+.ct-live{
+  display:flex;align-items:center;gap:6px;
+  color:var(--teal);font-size:11px;letter-spacing:1px;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--teal);animation:dpulse 2s infinite;
+}
+
+.chat-statusbar{
+  background:#f0f5ff;border-bottom:1px solid #dde6ff;
+  padding:9px 24px;display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--sky);
+}
+#sbarIcon{font-size:14px;}
+
+.chat-msgs{
+  height:440px;overflow-y:auto;
+  padding:22px;display:flex;flex-direction:column;gap:14px;
+  scroll-behavior:smooth;
+}
+.chat-msgs::-webkit-scrollbar{width:4px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.msg-row{display:flex;gap:10px;align-items:flex-end;animation:slideUp .3s ease;}
+.msg-row.user{flex-direction:row-reverse;}
+.m-av{
+  width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.bot-av{background:#eef3ff;}
+.usr-av{background:var(--steel);}
+.bubble{
+  max-width:72%;padding:12px 16px;
+  border-radius:18px;font-size:13px;line-height:1.7;
+}
+.b-bot{
+  background:#f7f9ff;border:1px solid #e4eaf8;
+  border-bottom-left-radius:4px;color:var(--ink);
+}
+.b-usr{
+  background:var(--sky);color:white;
+  border-bottom-right-radius:4px;
+}
+.btime{font-size:10px;color:var(--muted);margin-top:4px;}
+.msg-row.user .btime{text-align:right;}
+
+/* markdown rendering */
+.bubble strong{font-weight:600;}
+.bubble em{font-style:italic;}
+.bubble code{
+  background:rgba(26,107,255,.1);padding:2px 6px;border-radius:4px;
+  font-family:'DM Mono',monospace;font-size:11px;color:#0050d8;
+}
+.bubble .md-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px;}
+.bubble .md-table th{background:#eef3ff;padding:6px 10px;text-align:left;font-weight:600;font-size:11px;}
+.bubble .md-table td{padding:6px 10px;border-bottom:1px solid #e4eaf8;}
+.bubble .md-table td:last-child{font-family:'DM Mono',monospace;color:#0050d8;font-size:11px;}
+.bubble ul,.bubble ol{padding-left:18px;margin:6px 0;}
+.bubble li{margin-bottom:3px;}
+.bubble blockquote{
+  border-left:3px solid var(--teal);padding-left:10px;
+  color:var(--muted);margin:6px 0;font-size:12px;font-style:italic;
+}
+.b-usr .bubble code,.b-usr code{background:rgba(255,255,255,.2);color:white;}
+
+/* feedback */
+.fb-row{display:flex;gap:8px;margin-top:6px;}
+.fb-btn{
+  background:none;border:none;cursor:pointer;
+  font-size:14px;opacity:.5;transition:opacity .2s;padding:2px;
+}
+.fb-btn:hover{opacity:1;}
+
+/* typing */
+.typing-row{display:flex;gap:10px;align-items:center;animation:slideUp .3s ease;}
+.typing-bub{
+  background:#f7f9ff;border:1px solid #e4eaf8;
+  border-radius:18px;border-bottom-left-radius:4px;
+  padding:12px 16px;display:flex;gap:5px;align-items:center;
+}
+.td{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tdot 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-6px);opacity:1;}}
+
+/* chips */
+.chip-bar{
+  padding:12px 22px;display:flex;gap:8px;flex-wrap:wrap;
+  border-top:1px solid var(--border);background:#faf8f4;
+}
+.chip{
+  background:white;border:1px solid var(--border);border-radius:20px;
+  padding:6px 14px;font-size:11px;color:var(--steel);
+  cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;
+}
+.chip:hover{background:var(--sky);color:white;border-color:var(--sky);}
+
+/* input */
+.inp-area{
+  padding:14px 22px 18px;
+  border-top:1px solid var(--border);
+  display:flex;gap:10px;align-items:flex-end;background:white;
+}
+.inp-wrap{
+  flex:1;background:#f7f9ff;border:1.5px solid var(--border);
+  border-radius:16px;padding:11px 16px;transition:border-color .2s;
+}
+.inp-wrap:focus-within{border-color:var(--sky);}
+#chatInput{
+  width:100%;background:none;border:none;outline:none;
+  font-family:'DM Mono',monospace;font-size:13px;color:var(--ink);
+  resize:none;max-height:80px;line-height:1.5;
+}
+#chatInput::placeholder{color:var(--muted);}
+.send-btn{
+  width:46px;height:46px;border-radius:13px;
+  background:var(--sky);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(26,107,255,.35);
+}
+.send-btn:hover{background:#0050d8;transform:scale(1.05);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.send-btn svg{width:18px;height:18px;fill:white;}
+
+/* ═══════════════════ MODELS ═══════════════════ */
+.models-sec{padding:80px 72px;}
+.model-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px;}
+.m-card{
+  border:1.5px solid var(--border);border-radius:22px;
+  padding:36px 28px;text-align:center;transition:all .3s;background:white;
+}
+.m-card.highlight{
+  border-color:var(--sky);
+  background:linear-gradient(135deg,#eef3ff,#f4f8ff);
+  transform:scale(1.04);box-shadow:0 20px 60px rgba(26,107,255,.15);
+}
+.m-badge{
+  display:inline-block;background:var(--sky);color:white;
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:4px 14px;border-radius:20px;margin-bottom:16px;
+}
+.m-name{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--steel);margin-bottom:4px;}
+.m-cap{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.m-feats{font-size:12px;color:var(--muted);line-height:2;text-align:left;}
+.m-dim{font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+
+/* ═══════════════════ CONTACT ═══════════════════ */
+.contact-sec{padding:80px 72px;background:var(--steel);color:white;}
+.contact-sec .s-chip{color:var(--teal);}
+.contact-sec .s-title{color:white;}
+.contact-sec .s-sub{color:rgba(255,255,255,.5);}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:52px;align-items:start;}
+.ci-text{font-size:13px;color:rgba(255,255,255,.6);line-height:1.9;font-weight:300;}
+.ci-details{margin-top:28px;display:flex;flex-direction:column;gap:14px;}
+.ci-row{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:rgba(255,255,255,.7);}
+.ci-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.ci-row a{color:var(--teal);}
+.form{display:flex;flex-direction:column;gap:14px;}
+.form-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form input,.form textarea{
+  width:100%;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);border-radius:10px;
+  padding:13px 16px;color:white;
+  font-family:'DM Mono',monospace;font-size:13px;outline:none;
+  transition:border-color .2s;
+}
+.form input::placeholder,.form textarea::placeholder{color:rgba(255,255,255,.3);}
+.form input:focus,.form textarea:focus{border-color:var(--teal);}
+.form textarea{height:110px;resize:none;}
+.form-note{font-size:12px;min-height:18px;margin-top:4px;}
+.form-note.ok{color:var(--teal);}
+.form-note.err{color:#ff7575;}
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer{
+  background:#080d18;color:rgba(255,255,255,.5);
+  padding:44px 72px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.f-brand{font-family:'Syne',sans-serif;color:white;font-size:19px;font-weight:800;}
+.f-brand span{color:var(--sky);}
+.f-sub{font-size:12px;margin-top:5px;font-weight:300;}
+.f-right{text-align:right;font-size:12px;line-height:1.9;}
+.f-right a{color:var(--teal);}
+
+/* ═══════════════════ ANIMATIONS ═══════════════════ */
+.fade{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;}
+.fade.in{opacity:1;transform:none;}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media(max-width:960px){
+  nav{padding:14px 22px;}
+  .nav-links li:not(:last-child){display:none;}
+  .hero{grid-template-columns:1fr;}
+  .hero-right{clip-path:none;padding:36px 22px;}
+  .hero-left{padding:56px 22px 40px;}
+  .section,.chat-section,.qsec,.models-sec,.contact-sec{padding:60px 22px;}
+  .feat-grid,.qr-grid,.model-grid,.cg,.form-2{grid-template-columns:1fr;}
+  .m-card.highlight{transform:none;}
+  footer{flex-direction:column;gap:18px;padding:36px 22px;text-align:center;}
+  .f-right{text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ NAV ═══════ -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-sq">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div class="logo-text">SKY<span>LINK</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#quick-ref">Quick Ref</a></li>
+    <li><a href="#ai-chat">AI Support</a></li>
+    <li><a href="#models">Models</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#ai-chat" class="nav-cta">Chat with AI →</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="badge"><div class="dot-pulse"></div>AI-Powered · Delta v3.0</div>
+    <h1 class="hero-h">
+      Smart Support<br>for Your<br>
+      <em>Intercom System</em>
+    </h1>
+    <p class="hero-sub">
+      Ask anything about your Skylink Delta in plain language — programming codes, features, troubleshooting — and get instant accurate answers from our AI trained on the official manual.
+    </p>
+    <div class="btn-row">
+      <a href="#ai-chat" class="btn btn-blue">💬 Ask AI Now</a>
+      <a href="#quick-ref" class="btn btn-outline">📋 Quick Codes</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-n">128</div><div class="stat-l">Max Extensions</div></div>
+      <div><div class="stat-n">40+</div><div class="stat-l">Features</div></div>
+      <div><div class="stat-n">24/7</div><div class="stat-l">AI Support</div></div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="preview-card">
+      <div class="pc-head">
+        <div class="pc-av">🤖</div>
+        <div>
+          <div class="pc-name">Skylink AI Assistant</div>
+          <div class="pc-status">● Trained on official manual</div>
+        </div>
+      </div>
+      <div class="pc-msgs">
+        <div class="pm pm-bot">Hello! I know the complete Skylink Delta manual. What do you need?</div>
+        <div class="pm pm-user">How to enter programming mode?</div>
+        <div class="pm pm-bot pm-bot2">Dial <strong>#759</strong> then password <strong>119</strong>. Tone changes to confirm ✓</div>
+      </div>
+      <div class="pc-inp">
+        <div class="fi-fake">Type your question…</div>
+        <div class="send-fake">➤</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FEATURES ═══════ -->
+<section class="section" id="features">
+  <div class="fade">
+    <div class="s-chip">What the AI knows</div>
+    <h2 class="s-title">Everything in<br>your manual</h2>
+    <p class="s-sub">Trained on the complete Skylink Delta Programming & Operational Manual v3.0 — all features, all codes, all procedures.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="f-card fade"><div class="f-icon">📞</div><div class="f-name">Communication</div><div class="f-desc">Inter-flat calls, call hunting, all-party conference, auto redial, hotline, call pickup, Do Not Disturb and more.</div></div>
+    <div class="f-card fade"><div class="f-icon">🔒</div><div class="f-name">Security</div><div class="f-desc">Watchman watchdog, super cross check, panic alert codes, emergency dialing, barge-in from security.</div></div>
+    <div class="f-card fade"><div class="f-icon">🚪</div><div class="f-name">Door Release</div><div class="f-desc">Lobby door control from flat, direct & multi-door modes, door codes, relay port setup, extension assignment.</div></div>
+    <div class="f-card fade"><div class="f-icon">🏨</div><div class="f-name">Hotel Features</div><div class="f-desc">Call transfer, call camp, three-party conference — available when Hotel Mode is enabled.</div></div>
+    <div class="f-card fade"><div class="f-icon">⚙️</div><div class="f-name">System Config</div><div class="f-desc">Extension numbering, display settings, group configuration, factory reset, password management.</div></div>
+    <div class="f-card fade"><div class="f-icon">📢</div><div class="f-name">Optional Features</div><div class="f-desc">President Broadcast, Vendor Alarm (Pavwala, Bhajiwala, Doodhwala…), Talking Caller ID, wake-up alarms.</div></div>
+  </div>
+</section>
+
+<!-- ═══════ QUICK REF ═══════ -->
+<section class="qsec" id="quick-ref">
+  <div class="fade">
+    <div class="s-chip">Quick Reference</div>
+    <h2 class="s-title">Common Codes</h2>
+    <p class="s-sub">Most-used dial codes from the official Skylink Delta manual</p>
+  </div>
+  <div class="qr-grid">
+    <div class="qr-card fade">
+      <div class="qr-head"><span>📞</span>User Features</div>
+      <table class="ct">
+        <tr><td>Auto Redial missed call</td><td>#40</td></tr>
+        <tr><td>Call Forward / Follow Me</td><td>#41-Extn.No</td></tr>
+        <tr><td>Cancel Call Forward</td><td>#41</td></tr>
+        <tr><td>Do Not Disturb ON/OFF</td><td>#47</td></tr>
+        <tr><td>Panic Alert</td><td>#0</td></tr>
+        <tr><td>Emergency Dialing (4 extns)</td><td>#777</td></tr>
+        <tr><td>Barge-in (busy extension)</td><td>#44</td></tr>
+        <tr><td>Call Pickup (General)</td><td>6</td></tr>
+        <tr><td>Wake-up Alarm set</td><td>#766-HH-MM</td></tr>
+        <tr><td>Door Release (Direct)</td><td>756</td></tr>
+      </table>
+    </div>
+    <div class="qr-card fade">
+      <div class="qr-head"><span>🔧</span>System Config</div>
+      <table class="ct">
+        <tr><td>Enter Programming Mode</td><td>#759-119</td></tr>
+        <tr><td>Define Extension Number</td><td>200-PPP-NN*</td></tr>
+        <tr><td>Erase All Port Contents</td><td>299-22-22-23</td></tr>
+        <tr><td>Factory Reset Numbering</td><td>299-22-22-20</td></tr>
+        <tr><td>Change PM Password</td><td>300-XXX</td></tr>
+        <tr><td>Enable Hotel Mode</td><td>222-5-1</td></tr>
+        <tr><td>Define Door Relay Port</td><td>700-2</td></tr>
+        <tr><td>Change Door Release Code</td><td>727-NNN*</td></tr>
+        <tr><td>Enable Barge-in</td><td>#710-Extn.No</td></tr>
+        <tr><td>Software Version Check</td><td>#757</td></tr>
+      </table>
+    </div>
+    <div class="qr-card fade">
+      <div class="qr-head"><span>🔐</span>Security Features</div>
+      <table class="ct">
+        <tr><td>Watchdog Manager</td><td>#736-Extn</td></tr>
+        <tr><td>Watchman Extensions</td><td>#731-E1-E2-E3-E4</td></tr>
+        <tr><td>Activate Watchdog (Daily)</td><td>#732</td></tr>
+        <tr><td>Deactivate Watchdog</td><td>#734</td></tr>
+        <tr><td>Super Cross Check</td><td>#42</td></tr>
+        <tr><td>Check Panic Alerts</td><td>#45</td></tr>
+        <tr><td>No Man's Extension ON</td><td>#713-Extn.No</td></tr>
+        <tr><td>Block Flat Calls</td><td>#714-Extn.No</td></tr>
+        <tr><td>Enable Door Release</td><td>#717-Extn.No</td></tr>
+        <tr><td>Disable Door Release</td><td>#707-Extn.No</td></tr>
+      </table>
+    </div>
+    <div class="qr-card fade">
+      <div class="qr-head"><span>📢</span>Vendor Alarm Codes</div>
+      <table class="ct">
+        <tr><td>Pavwala Activate / Off</td><td>#21 / #11</td></tr>
+        <tr><td>Bhajiwala Activate / Off</td><td>#22 / #12</td></tr>
+        <tr><td>Doodhwala Activate / Off</td><td>#23 / #13</td></tr>
+        <tr><td>Plumber Activate / Off</td><td>#24 / #14</td></tr>
+        <tr><td>Electrician Activate / Off</td><td>#25 / #15</td></tr>
+        <tr><td>Broadcast Record</td><td>#3-119-1</td></tr>
+        <tr><td>Broadcast Play</td><td>#3-119-2</td></tr>
+        <tr><td>Broadcast Activate</td><td>#3-119-3</td></tr>
+        <tr><td>Broadcast Deactivate</td><td>#3-119-4</td></tr>
+        <tr><td>Broadcast w/ Ring</td><td>#3-119-6</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ AI CHAT ═══════ -->
+<section class="chat-section" id="ai-chat">
+  <div class="fade" style="text-align:center">
+    <div class="s-chip">Live AI Support</div>
+    <h2 class="s-title" style="text-align:center">Ask anything about<br>your Skylink Delta</h2>
+    <p class="s-sub" style="margin:0 auto">Our AI knows every feature, code and procedure from the official manual. Ask in plain language — no jargon needed.</p>
+  </div>
+
+  <div class="chat-box fade">
+    <div class="chat-top">
+      <div class="ct-left">
+        <div class="ct-av">🤖</div>
+        <div>
+          <div class="ct-name">Skylink Delta AI Assistant</div>
+          <div class="ct-sub">Skylink Programming & Operational Manual v3.0</div>
+        </div>
+      </div>
+      <div class="ct-live"><div class="live-dot"></div>ONLINE</div>
+    </div>
+
+    <div class="chat-statusbar">
+      <span id="sbarIcon">✅</span>
+      <span id="sbarText">Ready — connected to Skylink knowledge base</span>
+    </div>
+
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg-row">
+        <div class="m-av bot-av">🤖</div>
+        <div>
+          <div class="bubble b-bot">👋 Hello! I'm your <strong>Skylink Delta AI Assistant</strong>.<br><br>I can help with programming, security, door release, vendor alarms, hotel features and any other question about your intercom system.<br><br>What would you like help with?</div>
+          <div class="btime">Just now</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chip-bar" id="chipBar">
+      <div class="chip" onclick="quickAsk(this)">How to enter programming mode?</div>
+      <div class="chip" onclick="quickAsk(this)">How to release the lobby door?</div>
+      <div class="chip" onclick="quickAsk(this)">Set up Do Not Disturb</div>
+      <div class="chip" onclick="quickAsk(this)">Panic alert procedure</div>
+      <div class="chip" onclick="quickAsk(this)">Set wake-up alarm</div>
+      <div class="chip" onclick="quickAsk(this)">Watchdog feature explained</div>
+      <div class="chip" onclick="quickAsk(this)">Vendor alarm codes</div>
+      <div class="chip" onclick="quickAsk(this)">President Broadcast setup</div>
+    </div>
+
+    <div class="inp-area">
+      <div class="inp-wrap">
+        <textarea id="chatInput" rows="1"
+          placeholder="Ask anything about your Skylink Delta intercom…"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ MODELS ═══════ -->
+<section class="models-sec" id="models">
+  <div class="fade" style="text-align:center">
+    <div class="s-chip">Product Range</div>
+    <h2 class="s-title" style="text-align:center">Delta Series Models</h2>
+    <p class="s-sub" style="margin:0 auto">Three variants for every building size. All models share identical features — only the CPU card differs.</p>
+  </div>
+  <div class="model-grid">
+    <div class="m-card fade">
+      <div class="m-name">Delta 32</div>
+      <div class="m-cap">Up to 32 extensions</div>
+      <div class="m-feats">✓ CPU Card 64<br>✓ All standard features<br>✓ Up to 8 doors<br>✓ 15 display units<br>✓ Optional cards support</div>
+      <div class="m-dim">30 × 23 × 7 cm</div>
+    </div>
+    <div class="m-card highlight fade">
+      <div class="m-badge">Most Popular</div>
+      <div class="m-name">Delta 64</div>
+      <div class="m-cap">Up to 64 extensions</div>
+      <div class="m-feats">✓ CPU Card 64<br>✓ All standard features<br>✓ Up to 8 doors<br>✓ 15 display units<br>✓ Full optional card support</div>
+      <div class="m-dim">30 × 36 × 7 cm</div>
+    </div>
+    <div class="m-card fade">
+      <div class="m-name">Delta 128</div>
+      <div class="m-cap">Up to 128 extensions</div>
+      <div class="m-feats">✓ CPU Card 128<br>✓ All standard features<br>✓ Up to 8 doors<br>✓ 15 display units<br>✓ Full optional card support</div>
+      <div class="m-dim">30 × 36 × 14 cm</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CONTACT ═══════ -->
+<section class="contact-sec" id="contact">
+  <div class="fade">
+    <div class="s-chip">Get in Touch</div>
+    <h2 class="s-title">Contact Skylink</h2>
+    <p class="s-sub">Can't find what you need from the AI? Our support team is happy to help.</p>
+  </div>
+  <div class="cg">
+    <div class="fade">
+      <p class="ci-text">Skylink Communication is an ISO 9001:2008 certified company — designers and manufacturers of Society Intercom Systems, EPABX Systems and Telecom Products based in Mumbai.</p>
+      <div class="ci-details">
+        <div class="ci-row"><span class="ci-icon">📍</span><span>202–204 Ashok Industrial Estate,<br>Near Shangrila Biscuit Company,<br>L.B.S. Road, Bhandup (W), Mumbai 400078</span></div>
+        <div class="ci-row"><span class="ci-icon">📞</span><span><a href="tel:+912240107138">+91 22 40107138</a> &nbsp;/&nbsp; <a href="tel:+919321188702">+91 93211 88702</a></span></div>
+        <div class="ci-row"><span class="ci-icon">✉️</span><span><a href="mailto:info@skylinkcommunication.com">info@skylinkcommunication.com</a></span></div>
+        <div class="ci-row"><span class="ci-icon">🌐</span><span><a href="https://skylinkcommunication.com" target="_blank">skylinkcommunication.com</a></span></div>
+      </div>
+    </div>
+    <div class="fade">
+      <div class="form">
+        <div class="form-2">
+          <input type="text"  id="fName"  placeholder="Your Name *">
+          <input type="tel"   id="fPhone" placeholder="Phone Number">
+        </div>
+        <input type="email" id="fEmail" placeholder="Email Address *">
+        <textarea           id="fMsg"   placeholder="Your message or query about the intercom…"></textarea>
+        <button class="btn btn-blue" id="contactBtn" onclick="submitContact()">Send Message →</button>
+        <div class="form-note" id="formNote"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div>
+    <div class="f-brand">SKY<span>LINK</span> COMMUNICATION</div>
+    <div class="f-sub">ISO 9001:2008 Certified &nbsp;·&nbsp; © 2025 All Rights Reserved</div>
+  </div>
+  <div class="f-right">
+    Designers & Manufacturers of Society Intercom Systems<br>
+    <a href="tel:+912240107138">+91 22 40107138</a> &nbsp;·&nbsp; <a href="mailto:info@skylinkcommunication.com">info@skylinkcommunication.com</a>
+  </div>
+</footer>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+// ─── CONFIG ─────────────────────────────────────────────────
+const API_BASE = '';   // empty = same server (backend handles /api/*)
+let SESSION_ID = localStorage.getItem('sl_session') || null;
+let isBusy = false;
+
+// ─── DOM refs ────────────────────────────────────────────────
+const chatMsgs  = document.getElementById('chatMsgs');
+const sbarIcon  = document.getElementById('sbarIcon');
+const sbarText  = document.getElementById('sbarText');
+
+// ─── Time ────────────────────────────────────────────────────
+function timeNow() {
+  return new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true});
+}
+
+// ─── Textarea auto-resize ────────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+// ─── Enter key ───────────────────────────────────────────────
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+// ─── Scroll to bottom ────────────────────────────────────────
+function scrollDown() { chatMsgs.scrollTop = chatMsgs.scrollHeight; }
+
+// ─── Markdown renderer ───────────────────────────────────────
+function renderMD(text) {
+  // Tables
+  text = text.replace(/\n\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)+)/g, (_, header, rows) => {
+    const ths = header.split('|').filter(c=>c.trim()).map(c=>`<th>${c.trim()}</th>`).join('');
+    const trs = rows.trim().split('\n').map(row => {
+      const tds = row.split('|').filter(c=>c.trim()).map(c=>`<td>${c.trim()}</td>`).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    return `<table class="md-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+  // Bold, italic, code
+  text = text
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+  return text;
+}
+
+// ─── Add message ─────────────────────────────────────────────
+function addMessage(html, isUser, msgId=null) {
+  const row = document.createElement('div');
+  row.className = `msg-row${isUser?' user':''}`;
+
+  const av = document.createElement('div');
+  av.className = `m-av ${isUser?'usr-av':'bot-av'}`;
+  av.textContent = isUser ? '👤' : '🤖';
+
+  const wrap = document.createElement('div');
+
+  const bub = document.createElement('div');
+  bub.className = `bubble ${isUser?'b-usr':'b-bot'}`;
+  bub.innerHTML = html;
+
+  const time = document.createElement('div');
+  time.className = 'btime';
+  time.textContent = timeNow();
+
+  // Feedback for bot messages
+  if (!isUser && msgId) {
+    const fbRow = document.createElement('div');
+    fbRow.className = 'fb-row';
+    ['👍 Helpful','👎 Not helpful'].forEach((label, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'fb-btn';
+      btn.textContent = label;
+      btn.onclick = () => {
+        sendFeedback(msgId, i===0 ? 5 : 1);
+        fbRow.innerHTML = '<span style="font-size:11px;color:var(--muted)">Thanks for feedback!</span>';
+      };
+      fbRow.appendChild(btn);
+    });
+    time.appendChild(fbRow);
+  }
+
+  wrap.appendChild(bub);
+  wrap.appendChild(time);
+
+  if (isUser) { row.appendChild(wrap); row.appendChild(av); }
+  else        { row.appendChild(av);   row.appendChild(wrap); }
+
+  chatMsgs.appendChild(row);
+  scrollDown();
+}
+
+// ─── Typing indicator ────────────────────────────────────────
+function showTyping() {
+  const row = document.createElement('div');
+  row.className = 'typing-row'; row.id = 'typing';
+  const av = document.createElement('div');
+  av.className = 'm-av bot-av'; av.textContent = '🤖';
+  const bub = document.createElement('div');
+  bub.className = 'typing-bub';
+  bub.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
+  row.appendChild(av); row.appendChild(bub);
+  chatMsgs.appendChild(row); scrollDown();
+}
+function hideTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+// ─── Status bar ──────────────────────────────────────────────
+function setStatus(icon, text) {
+  sbarIcon.textContent = icon;
+  sbarText.textContent = text;
+}
+
+// ─── SEND MESSAGE → Backend API ──────────────────────────────
+async function sendMessage() {
+  if (isBusy) return;
+  const input = document.getElementById('chatInput');
+  const btn   = document.getElementById('sendBtn');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  isBusy = true;
+  input.value = ''; input.style.height = 'auto';
+  btn.disabled = true;
+  document.getElementById('chipBar').style.display = 'none';
+
+  addMessage(text, true);
+  showTyping();
+  setStatus('⏳', 'Searching Skylink knowledge base…');
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/chat`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ session_id: SESSION_ID, message: text })
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+
+    SESSION_ID = data.session_id;
+    localStorage.setItem('sl_session', SESSION_ID);
+
+    hideTyping();
+    addMessage(renderMD(data.response), false, data.message_id);
+    setStatus('✅', 'Answer ready — from Skylink Delta manual');
+
+  } catch (err) {
+    hideTyping();
+    addMessage(
+      '⚠️ <strong>Cannot connect to server.</strong><br><br>' +
+      'Make sure the backend is running:<br><code>python backend/main.py</code><br><br>' +
+      'Then refresh this page.',
+      false
+    );
+    setStatus('❌', 'Server offline — start backend and refresh');
+    console.error('API error:', err);
+  } finally {
+    isBusy = false;
+    btn.disabled = false;
+  }
+}
+
+// ─── Quick-ask chips ─────────────────────────────────────────
+function quickAsk(chip) {
+  document.getElementById('chatInput').value = chip.textContent;
+  sendMessage();
+}
+
+// ─── Feedback ────────────────────────────────────────────────
+async function sendFeedback(msgId, rating) {
+  try {
+    await fetch(`${API_BASE}/api/feedback`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ session_id: SESSION_ID, message_id: msgId, rating })
+    });
+  } catch(e) { /* silent */ }
+}
+
+// ─── Contact form → Backend API ──────────────────────────────
+async function submitContact() {
+  const name  = document.getElementById('fName').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const msg   = document.getElementById('fMsg').value.trim();
+  const btn   = document.getElementById('contactBtn');
+  const note  = document.getElementById('formNote');
+
+  if (!name || !email) {
+    note.textContent = '⚠️ Name and email are required.';
+    note.className = 'form-note err'; return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Sending…'; note.textContent='';
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, message: msg })
+    });
+    const data = await resp.json();
+    note.textContent = '✅ ' + data.message;
+    note.className = 'form-note ok';
+    ['fName','fEmail','fPhone','fMsg'].forEach(id => document.getElementById(id).value='');
+  } catch(e) {
+    note.textContent = '❌ Failed. Please call +91 22 40107138 directly.';
+    note.className = 'form-note err';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send Message →';
+  }
+}
+
+// ─── Fade-in on scroll ───────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
